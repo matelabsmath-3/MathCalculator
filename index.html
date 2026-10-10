@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>MathAI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 32px;
+    margin: 0;
+}
+
+header p {
+    color: #aaa;
+}
+
+nav {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+nav button {
+    flex: 1;
+    min-width: 75px;
+    padding: 12px 8px;
+    border: 1px solid #333;
+    border-radius: 12px;
+    background: #171717;
+    color: white;
+}
+
+nav button.active {
+    background: white;
+    color: black;
+}
+
+main {
+    max-width: 520px;
+    margin: auto;
+    padding: 12px;
+}
+
+section {
+    display: none;
+}
+
+section.active {
+    display: block;
+}
+
+.card {
+    background: #101010;
+    border: 1px solid #292929;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 15px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.action {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.calculator {
+    background: #171717;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+.display {
+    min-height: 150px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 15px 8px 25px;
+    font-size: clamp(45px, 12vw, 75px);
+    font-weight: 300;
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+.keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.key {
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 50%;
+    background: #3a3a3c;
+    color: white;
+    font-size: clamp(23px, 6vw, 40px);
+}
+
+.utility {
+    background: #a5a5a7;
+    color: #111;
+}
+
+.operator {
+    background: #f39a1e;
+    color: white;
+}
+
+.zero {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    border-radius: 100px;
+    text-align: left;
+    padding-left: 20%;
+}
+
+.table {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.table div {
+    background: #171717;
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.question {
+    font-size: 32px;
+    text-align: center;
+    margin: 25px 0;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.answers button {
+    padding: 18px;
+    background: #202020;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 12px;
+    font-size: 20px;
+}
+
+.result {
+    padding: 12px;
+    margin-top: 12px;
+    background: #080808;
+    border: 1px solid #333;
+    border-radius: 12px;
+}
+
+footer {
+    text-align: center;
+    color: #777;
+    padding: 25px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>MathAI</h1>
+    <p>Tu compañero de matemáticas</p>
+</header>
+
+<nav>
+    <button class="active" onclick="showPage('inicio',this)">Inicio</button>
+    <button onclick="showPage('calculadora',this)">Calculadora</button>
+    <button onclick="showPage('tablas',this)">Tablas</button>
+    <button onclick="showPage('desafio',this)">Desafíos</button>
+    <button onclick="showPage('aprender',this)">Aprender</button>
+</nav>
+
+<main>
+
+<section id="inicio" class="active">
+    <div class="card">
+        <h2>¡Bienvenido a MathAI!</h2>
+        <p>Aprendé matemáticas, practicá y superá desafíos.</p>
+    </div>
+
+    <div class="card">
+        <h2>🧮 Calculadora</h2>
+        <button class="action" onclick="showPage('calculadora',document.querySelectorAll('nav button')[1])">
+            Abrir calculadora
+        </button>
+    </div>
+
+    <div class="card">
+        <h2>✖️ Tablas de multiplicar</h2>
+        <button class="action" onclick="showPage('tablas',document.querySelectorAll('nav button')[2])">
+            Ver tablas
+        </button>
+    </div>
+
+    <div class="card">
+        <h2>🎯 Desafíos</h2>
+        <button class="action" onclick="showPage('desafio',document.querySelectorAll('nav button')[3])">
+            Jugar
+        </button>
+    </div>
+</section>
+
+<section id="calculadora">
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+
+        <div class="keys">
+            <button class="key utility" onclick="clearCalc()">AC</button>
+            <button class="key utility" onclick="changeSign()">+/−</button>
+            <button class="key utility" onclick="percent()">%</button>
+            <button class="key operator" onclick="choose('/')">÷</button>
+
+            <button class="key" onclick="digit('7')">7</button>
+            <button class="key" onclick="digit('8')">8</button>
+            <button class="key" onclick="digit('9')">9</button>
+            <button class="key operator" onclick="choose('*')">×</button>
+
+            <button class="key" onclick="digit('4')">4</button>
+            <button class="key" onclick="digit('5')">5</button>
+            <button class="key" onclick="digit('6')">6</button>
+            <button class="key operator" onclick="choose('-')">−</button>
+
+            <button class="key" onclick="digit('1')">1</button>
+            <button class="key" onclick="digit('2')">2</button>
+            <button class="key" onclick="digit('3')">3</button>
+            <button class="key operator" onclick="choose('+')">+</button>
+
+            <button class="key zero" onclick="digit('0')">0</button>
+            <button class="key" onclick="decimal()">.</button>
+            <button class="key operator" onclick="equals()">=</button>
+        </div>
+    </div>
+</section>
+
+<section id="tablas">
+    <div class="card">
+        <h2>Tablas de multiplicar</h2>
+        <label for="tableNumber">Elegí un número del 1 al 100</label>
+        <input id="tableNumber" type="number" min="1" max="100" value="7">
+        <button class="action" onclick="makeTable()">Mostrar tabla</button>
+        <div id="tableResult" class="table"></div>
+    </div>
+</section>
+
+<section id="desafio">
+    <div class="card">
+        <h2>Desafío matemático</h2>
+        <p>Puntos: <strong id="score">0</strong></p>
+        <div id="question" class="question">¡Preparado!</div>
+        <div id="answers" class="answers"></div>
+        <p id="feedback"></p>
+        <button class="action" onclick="newQuestion()">Nueva pregunta</button>
+    </div>
+</section>
+
+<section id="aprender">
+    <div class="card">
+        <h2>Aprender matemáticas</h2>
+
+        <h3>Porcentajes</h3>
+        <p>Para calcular el 20 % de 50: 50 × 20 ÷ 100 = 10.</p>
+
+        <h3>Fracciones</h3>
+        <p>En 3/4, el 3 es el numerador y el 4 es el denominador.</p>
+
+        <h3>Orden de operaciones</h3>
+        <p>Primero paréntesis, después potencias, multiplicaciones y divisiones, y finalmente sumas y restas.</p>
+
+        <h3>Regla de tres</h3>
+        <p>Si 2 cuadernos cuestan $600, 4 cuadernos cuestan $1.200.</p>
+    </div>
+</section>
+
+</main>
+
+<footer>MathAI · Matemáticas para todos</footer>
+
+<script>
+function showPage(id, button) {
+    document.querySelectorAll('main section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    button.classList.add('active');
+}
+
+/* CALCULADORA */
+
+let current = '0';
+let stored = null;
+let operator = null;
+let resetDisplay = false;
+
+function render() {
+    document.getElementById('display').textContent = current;
+}
+
+function digit(number) {
+    if (resetDisplay || current === 'Error') {
+        current = number;
+        resetDisplay = false;
+    } else if (current === '0') {
+        current = number;
+    } else if (current.length < 15) {
+        current += number;
+    }
+    render();
+}
+
+function decimal() {
+    if (resetDisplay || current === 'Error') {
+        current = '0.';
+        resetDisplay = false;
+    } else if (!current.includes('.')) {
+        current += '.';
+    }
+    render();
+}
+
+function clearCalc() {
+    current = '0';
+    stored = null;
+    operator = null;
+    resetDisplay = false;
+    render();
+}
+
+function changeSign() {
+    if (current !== '0' && current !== 'Error') {
+        current = current.startsWith('-')
+            ? current.slice(1)
+            : '-' + current;
+    }
+    render();
+}
+
+function percent() {
+    current = String(Number(current) / 100);
+    render();
+}
+
+function calculate(a, op, b) {
+    if (op === '+') return a + b;
+    if (op === '-') return a - b;
+    if (op === '*') return a * b;
+    if (op === '/') return b === 0 ? NaN : a / b;
+}
+
+function choose(op) {
+    if (current === 'Error') return;
+
+    if (operator !== null && !resetDisplay) {
+        equals();
+    }
+
+    stored = Number(current);
+    operator = op;
+    resetDisplay = true;
+}
+
+function equals() {
+    if (operator === null || stored === null) return;
+
+    const result = calculate(stored, operator, Number(current));
+
+    current = Number.isFinite(result)
+        ? String(Number(result.toFixed(9)))
+        : 'Error';
+
+    stored = null;
+    operator = null;
+    resetDisplay = true;
+    render();
+}
+
+/* TABLAS */
+
+function makeTable() {
+    const n = Number(document.getElementById('tableNumber').value);
+    const result = document.getElementById('tableResult');
+
+    if (!Number.isInteger(n) || n < 1 || n > 100) {
+        result.innerHTML = '<div>Ingresá un número del 1 al 100.</div>';
+        return;
+    }
+
+    result.innerHTML = '';
+
+    for (let i = 1; i <= 12; i++) {
+        const line = document.createElement('div');
+        line.textContent = `${n} × ${i} = ${n * i}`;
+        result.appendChild(line);
+    }
+}
+
+/* DESAFÍOS */
+
+let score = 0;
+let answer = 0;
+let answered = false;
+
+function newQuestion() {
+    const a = Math.floor(Math.random() * 12) + 1;
+    const b = Math.floor(Math.random() * 12) + 1;
+    const operations = ['+', '-', '×'];
+    const op = operations[Math.floor(Math.random() * operations.length)];
+
+    let x = a;
+    let y = b;
+
+    if (op === '-' && y > x) {
+        [x, y] = [y, x];
+    }
+
+    answer = op === '+' ? x + y :
+             op === '-' ? x - y : x * y;
+
+    answered = false;
+
+    document.getElementById('question').textContent =
+        `${x} ${op} ${y} = ?`;
+
+    document.getElementById('feedback').textContent = '';
+
+    const options = new Set([answer]);
+
+    while (options.size < 4) {
+        const wrong = answer + Math.floor(Math.random() * 15) - 7;
+
+        if (wrong >= 0 && wrong !== answer) {
+            options.add(wrong);
+        }
+    }
+
+    const shuffled = [...options].sort(() => Math.random() - 0.5);
+    const container = document.getElementById('answers');
+
+    container.innerHTML = '';
+
+    shuffled.forEach(value => {
+        const button = document.createElement('button');
+        button.textContent = value;
+
+        button.onclick = () => {
+            if (answered) return;
+            answered = true;
+
+            if (value === answer) {
+                score++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('feedback').textContent =
+                    '¡Correcto! +1 punto';
+            } else {
+                document.getElementById('feedback').textContent =
+                    `La respuesta correcta era ${answer}.`;
+            }
+        };
+
+        container.appendChild(button);
+    });
+}
+
+makeTable();
+newQuestion();
+</script>
+
+</body>
+</html>
